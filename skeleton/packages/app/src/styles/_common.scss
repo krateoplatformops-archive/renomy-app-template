@@ -1,0 +1,18 @@
+@import 'colors';
+@import 'mixin';
+
+.common-btn-container {
+  @extend .display-flex;
+  @extend .flex-direction-row;
+  @extend .flex-center-end;
+  width: 100%;
+}
+
+.common-refresh {
+  background: $green;
+  padding: 10px;
+  @include border-radius(5px);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  @extend .bsbb;
+}

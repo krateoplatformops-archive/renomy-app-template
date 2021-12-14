@@ -1,0 +1,98 @@
+@import 'colors';
+@import 'mixin';
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: $blue-grey-900;
+  color: $white;
+}
+
+body,
+div,
+input,
+select,
+textarea,
+a,
+button,
+pre {
+  font-size: 15px;
+  font-family: 'Didact Gothic', sans-serif;
+  vertical-align: top;
+  font-weight: 400;
+  color: $white;
+  border: 0;
+  outline: none;
+}
+textarea {
+  resize: none;
+}
+
+a,
+button {
+  @extend .trstn;
+  &:hover {
+    @extend .trstn;
+  }
+}
+
+::selection {
+  background-color: $blue;
+  color: $white;
+}
+
+::-moz-selection {
+  background-color: $blue;
+  color: $white;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+}
+
+:disabled {
+  cursor: not-allowed;
+  @include opacity(0.3);
+}
+
+label {
+  display: block;
+  text-transform: uppercase;
+  color: $orange;
+  font-weight: 600;
+  font-size: 10px;
+  width: 100%;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  @include border-radius(3px);
+  @extend .bsbb;
+  height: 40px;
+  color: $grey-900;
+  &:focus {
+    @include box-shadow(0, 0, 3px, 0, $my-primary);
+  }
+}
+
+textarea {
+  min-height: 100px;
+}
+
+button {
+  padding: 0;
+}
+
+code {
+  display: block;
+  font-family: 'Source Code Pro', monospace;
+  padding: 10px;
+  background: $grey-100;
+}

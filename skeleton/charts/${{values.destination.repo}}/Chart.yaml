@@ -1,0 +1,13 @@
+apiVersion: v2
+name: renomy-app-template
+description: Simple React-Node-MySql App Template
+type: application
+icon: 'https://github.com/projectkerberus/kerberus-dashboard/blob/main/docs/media/square_black_logo.png'
+
+version: 0.1.0
+appVersion: 0.1.0
+
+maintainers:
+  - name: Mauro Sala
+    email: mauro.sala@kiratech.it
+    url: https://www.kiratech.it

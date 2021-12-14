@@ -1,0 +1,51 @@
+@import '../../../styles/colors';
+@import '../../../styles/mixin';
+
+.Body {
+  @extend .display-flex;
+  @extend .flex-direction-column;
+  @extend .flex-center;
+  width: 100%;
+}
+
+.Logo {
+  width: 300px;
+}
+
+.UlNav {
+  @extend .display-flex;
+  @extend .flex-direction-row;
+  @extend .flex-center;
+  padding: 20px 0;
+  li {
+    width: 200px;
+    text-align: center;
+  }
+}
+
+.Link {
+  color: $white;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 20px;
+  font-size: 20px;
+  @extend .bsbb;
+  @include border-radius(5px);
+  &:hover {
+    color: $blue;
+  }
+}
+
+.LinkActive {
+  background: $blue;
+  &:hover {
+    color: $white;
+  }
+}
+
+.Content {
+  @extend .responsive-width;
+  @extend .display-flex;
+  @extend .flex-direction-column;
+  @extend .flex-center;
+}

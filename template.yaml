@@ -1,0 +1,129 @@
+apiVersion: backstage.io/v1beta2
+kind: Template
+metadata:
+  name: renomy-app-template
+  title: ReNoMy App template
+  description: Create a simple Demo App (ReNoMy)
+  tags:
+    - demo
+    - react
+    - node
+    - mysql
+spec:
+  owner: mauro.sala@kiratech.it
+  type: service
+
+  # these are the steps which are rendered in the frontend with the form input
+  parameters:
+    - title: Demp App values
+      required:
+        - component_id
+        - description
+        - dbUsername
+        - owner
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the component
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this service does.
+        dbUsername:
+          title: Database Username
+          type: string
+          description: Database Username
+          default: admin
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+    - title: Choose Url
+      required:
+        - appUrl
+        - apiUrl
+      properties:
+        appUrl:
+          title: App url
+          type: string
+          description: App url without https://
+        apiUrl:
+          title: Api Url
+          type: string
+          description: Api url without https://
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  # here's the steps that are executed in series in the scaffolder backend
+  steps:
+    - id: template
+      name: Fetch Skeleton + Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        copyWithoutRender:
+          - .github/workflows/*
+        values:
+          component_id: "{{ parameters.component_id }}"
+          description: "{{ parameters.description }}"
+          dbUsername: "{{ parameters.dbUsername }}"
+          appUrl: "{{ parameters.appUrl }}"
+          apiUrl: "{{ parameters.apiUrl }}"
+          owner: "{{ parameters.owner }}"
+          destination: "{{ parseRepoUrl parameters.repoUrl }}"
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: "This is a Demo App with name {{ parameters.component_id }}"
+        repoUrl: "{{ parameters.repoUrl }}"
+        repoVisibility: public
+        defaultBranch: main
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: "{{ steps.publish.output.repoContentsUrl }}"
+        catalogInfoPath: "/catalog-info.yaml"
+
+    - id: argocd
+      name: Create application on ArgoCD
+      action: kerberus:argocd
+      input:
+        host: ${{parameters.repoUrl}}
+        pathRepoSubfolder: "true"
+
+    - id: sonarcloud
+      name: Create application on SonarCloud
+      action: kerberus:sonarcloud
+      input:
+        host: ${{parameters.repoUrl}}
+
+    - id: githubprotection
+      name: Set GitHub branch protection
+      action: kerberus:githubprotection
+      input:
+        host: ${{parameters.repoUrl}}
+
+  output:
+    remoteUrl: "{{ steps.publish.output.remoteUrl }}"
+    entityRef: "{{ steps.register.output.entityRef }}"

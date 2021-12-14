@@ -1,0 +1,116 @@
+name: Publish Docker Images
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  api-build:
+    name: Build Api Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: ./packages/api/Dockerfile
+          context: ./packages/api/
+          push: true
+          tags: ghcr.io/${{ github.event.repository.owner.name }}/${{ github.event.repository.name }}_api:latest
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  app-build:
+    name: Build App Image
+    runs-on: ubuntu-latest
+    needs: [api-build]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: ./packages/app/Dockerfile
+          context: ./packages/app/
+          push: true
+          tags: ghcr.io/${{ github.event.repository.owner.name }}/${{ github.event.repository.name }}_app:latest
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+  tag-repo:
+    name: Create Tag and Branch
+    runs-on: ubuntu-latest
+    needs: [api-build, app-build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+      - name: Create Branch
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: "gh-pages"
+      - name: Create Tag
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.package-version.outputs.current-version }}
+  prepare-repo:
+    name: Prepare the repo
+    runs-on: ubuntu-latest
+    needs: [api-build, app-build, tag-repo]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+      - name: Bump release version
+        id: bump_version
+        uses: christian-draeger/increment-semantic-version@1.0.2
+        with:
+          current-version: ${{ steps.package-version.outputs.current-version }}
+          version-fragment: "bug"
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Version bump
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          npm version patch
+      - name: Create local changes
+        run: |
+          sed -i --regexp-extended '0,/version: *(.*)/{s//version: ${{ steps.bump_version.outputs.next-version }}/}' charts/${{github.event.repository.name}}/Chart.yaml
+          sed -i --regexp-extended '0,/appVersion: *(.*)/{s//appVersion: ${{ steps.bump_version.outputs.next-version }}/}' charts/${{github.event.repository.name}}/Chart.yaml
+          git commit -m "Change helm version" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main

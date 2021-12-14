@@ -1,0 +1,62 @@
+{{- if .Values.api }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: renomy-api
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: renomy-api
+  template:
+    metadata:
+      labels:
+        app: renomy-api
+        component: {{ .Release.Namespace }}
+    spec:
+      containers:
+        - name: renomy-api
+          image: {{ .Values.images.api }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/logs
+              name: log-volume
+          env:
+            - name: DB_NAME
+              value: {{ .Values.api.db.name }}
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: rdsmariadbql-conn
+                  key: endpoint
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: rdsmariadbql-conn
+                  key: port
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rdsmariadbql-conn
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rdsmariadbql-conn
+                  key: password
+      volumes:
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: logs-pvc

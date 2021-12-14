@@ -1,0 +1,17 @@
+{{- if .Values.commonLabels }}
+  ---
+{{- end }}
+apiVersion: aws.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: aws-stack-template-provider
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: PruneLast=true
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: crossplane-system
+      name: aws-creds
+      key: credentials

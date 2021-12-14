@@ -1,0 +1,88 @@
+openapi: 3.0.1
+info:
+  title: ReNoMy Sample App
+  description: ReNoMy Sample App Template
+  version: "0.1"
+servers:
+  - url: https://${{values.apiUrl}}
+    description: OpenAPI
+paths:
+  /logs:
+    get:
+      description: Get logs list
+      responses:
+        "200":
+          description: List of logs
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    {
+                      "time": "2021-10-05T08:01:48.893Z",
+                      "method": "GET",
+                      "path": "/todo",
+                    }
+
+      servers:
+        - url: https://${{values.apiUrl}}
+    servers:
+      - url: https://${{values.apiUrl}}
+  /todo:
+    get:
+      description: Get todo list
+      responses:
+        "200":
+          description: List of todo
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example: { "id": 1, "message": "buy milk" }
+
+      servers:
+        - url: https://${{values.apiUrl}}
+    post:
+      description: Add todo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+            examples:
+              "0":
+                value: { "message": "my new todo" }
+      responses:
+        "200":
+          description: Get todo list with last added item
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example: { "id": 2, "message": "my new todo" }
+      servers:
+        - url: https://${{values.apiUrl}}
+    delete:
+      description: Delete todo
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+          example: "1"
+      responses:
+        "200":
+          description: Delete successfully
+      servers:
+        - url: https://${{values.apiUrl}}
+    servers:
+      - url: https://${{values.apiUrl}}

@@ -1,0 +1,21 @@
+# ENV PORT 8080
+# ENV HOST "0.0.0.0"
+# ENV DB_HOST "localhost"
+# ENV DB_PORT "3306"
+# ENV DB_USERNAME "admin"
+# ENV DB_PASSWORD "AlienPassword123"
+# ENV DB_NAME "mysqltst"
+
+# REACT_APP_API_URL
+
+images:
+  api: ghcr.io/${{values.destination.owner + "/" + values.destination.repo}}_api:latest
+  app: ghcr.io/${{values.destination.owner + "/" + values.destination.repo}}_app:latest
+
+api:
+  db:
+    username: ${{values.dbUsername}}
+    name: renomydb
+
+appUrl: ${{values.appUrl}}
+apiUrl: ${{values.apiUrl}}

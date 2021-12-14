@@ -1,0 +1,48 @@
+{{- if .Values.commonLabels }}
+  ---
+{{- end }}
+apiVersion: database.aws.crossplane.io/v1beta1
+kind: RDSInstance
+metadata:
+  name: {{ .Release.Namespace }}
+  labels:
+    backstage.io/kubernetes-id: renomy
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  forProvider:
+    region: eu-central-1
+    allocatedStorage: 10
+    autoMinorVersionUpgrade: true
+    backupRetentionPeriod: 0
+    caCertificateIdentifier: rds-ca-2019
+    copyTagsToSnapshot: false
+    dbInstanceClass: db.t2.micro
+    deletionProtection: false
+    enableIAMDatabaseAuthentication: false
+    enablePerformanceInsights: false
+    engine: mariadb
+    dbName: renomydb
+    engineVersion: '10.4.13'
+    licenseModel: general-public-license
+    masterUsername: {{ .Values.api.db.username | quote }}
+    masterPasswordSecretRef:
+      key: password
+      name: rdsmariadbql-conn
+      namespace: {{ .Release.Namespace }}
+    multiAZ: false
+    skipFinalSnapshotBeforeDeletion: true
+    port: 3306
+    publiclyAccessible: true
+    storageEncrypted: false
+    storageType: standard
+    dbSubnetGroupName: default-vpc-0f75872a0d43d79ed
+    vpcSecurityGroupIds:
+      - sg-0a89249fcb7661906
+    tags:
+      - key: kubernetes_namespace
+        value: {{ .Release.Namespace }}
+  writeConnectionSecretToRef:
+    name: rdsmariadbql-conn
+    namespace: {{ .Release.Namespace }}
+  providerConfigRef:
+    name: aws-stack-template-provider

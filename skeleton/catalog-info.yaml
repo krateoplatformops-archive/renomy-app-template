@@ -1,0 +1,104 @@
+# Frontend
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.component_id}}-fe
+  description: ReNoMy Frontend
+  links:
+    - url: https://github.com/${{values.destination.owner + "/" + values.destination.repo}}
+      title: ${{values.component_id | dump}}
+      icon: "dashboard"
+  annotations:
+    github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: ${{values.destination.repo | dump}}
+    backstage.io/kubernetes-label-selector: "component=${{ values.component_id }}"
+    sonarqube.org/project-key: ${{values.destination.owner + "_" + values.destination.repo}}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{values.owner | dump}}
+  consumesApis:
+    - ${{values.component_id}}-api
+  dependsOn: ["component:${{values.component_id}}-be"]
+  system: ${{values.component_id}}-system
+---
+# Backend
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.component_id}}-be
+  description: ReNoMy Backend
+  links:
+    - url: https://github.com/${{values.destination.owner + "/" + values.destination.repo}}
+      title: ${{values.component_id | dump}}
+      icon: "dashboard"
+  annotations:
+    github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: ${{values.destination.repo | dump}}
+    backstage.io/kubernetes-label-selector: "component=${{ values.component_id }}"
+    sonarqube.org/project-key: ${{values.destination.owner + "_" + values.destination.repo}}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{values.owner | dump}}
+  providesApis:
+    - ${{values.component_id}}-api
+  dependsOn: ["resource:${{values.component_id}}-db"]
+  system: ${{values.component_id}}-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: ${{values.component_id}}-api
+  description: Todo API
+  links:
+    - url: https://krateo.io
+      title: "krateo.io"
+      icon: "dashboard"
+  tags:
+    - openapi
+    - rest
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: ${{values.owner | dump}}
+  apiProvidedBy: ${{values.component_id}}-be
+  apiConsumedBy:
+    - ${{values.component_id}}-fe
+  definition:
+    $text: https://github.com/${{values.destination.owner + "/" + values.destination.repo}}/blob/main/openapi.yaml
+  system: ${{values.component_id}}-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ${{values.component_id}}-system
+  description: AWS Cloud
+spec:
+  owner: ${{values.owner | dump}}
+  domain: ${{values.component_id}}-domain
+  system: ${{values.component_id}}-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ${{values.component_id}}-db
+  description: Stores todos
+  links:
+    - url: https://krateo.io
+      title: "krateo.io"
+      icon: "dashboard"
+spec:
+  type: database
+  owner: ${{values.owner | dump}}
+  system: ${{values.component_id}}-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: ${{values.component_id}}-domain
+  description: ${{values.component_id}} domain
+spec:
+  owner: ${{values.owner | dump}}

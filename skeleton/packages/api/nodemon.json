@@ -1,0 +1,11 @@
+{
+  "env": {
+    "PORT": "8080",
+    "HOST": "0.0.0.0",
+    "DB_HOST": "localhost",
+    "DB_PORT": "3306",
+    "DB_USERNAME": "admin",
+    "DB_PASSWORD": "AlienPassword1234",
+    "DB_NAME": "mysqltst"
+  }
+}

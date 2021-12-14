@@ -1,0 +1,11 @@
+{{- if .Values.commonLabels }}
+  ---
+{{- end }}
+
+apiVersion: kuma.io/v1alpha1
+kind: Mesh
+metadata:
+  name: ${{values.component_id}}-mesh
+  labels:
+    component: {{ .Release.Namespace }}
+spec:
