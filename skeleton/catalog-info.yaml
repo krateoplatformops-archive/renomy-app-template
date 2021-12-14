@@ -4,6 +4,8 @@ kind: Component
 metadata:
   name: ${{values.component_id}}-fe
   description: ReNoMy Frontend
+  tags:
+    - react
   links:
     - url: https://github.com/${{values.destination.owner + "/" + values.destination.repo}}
       title: ${{values.component_id | dump}}
@@ -29,6 +31,9 @@ kind: Component
 metadata:
   name: ${{values.component_id}}-be
   description: ReNoMy Backend
+  tags:
+    - nodejs
+    - api
   links:
     - url: https://github.com/${{values.destination.owner + "/" + values.destination.repo}}
       title: ${{values.component_id | dump}}
