@@ -35,9 +35,9 @@ spec:
     publiclyAccessible: true
     storageEncrypted: false
     storageType: standard
-    dbSubnetGroupName: default-vpc-0f75872a0d43d79ed
+    dbSubnetGroupName: {{ .Values.subnetGroupName }}
     vpcSecurityGroupIds:
-      - sg-0a89249fcb7661906
+      - {{ .Values.vpcSecurityGroup }}
     tags:
       - key: kubernetes_namespace
         value: {{ .Release.Namespace }}

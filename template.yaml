@@ -58,6 +58,22 @@ spec:
           type: string
           description: Api url without https://
 
+    - title: AWS vpc
+      required:
+        - subnetGroupName
+        - vpcSecurityGroup
+      properties:
+        subnetGroupName:
+          title: Subnet Group Name
+          type: string
+          default: default-vpc-0f75872a0d43d79ed
+          description: Subnet Group Name
+        vpcSecurityGroup:
+          title: VPC Security Group
+          type: string
+          default: sg-0a89249fcb7661906
+          description: VPC Security Group
+
     - title: Choose a location
       required:
         - repoUrl
@@ -85,6 +101,8 @@ spec:
           dbUsername: "{{ parameters.dbUsername }}"
           appUrl: "{{ parameters.appUrl }}"
           apiUrl: "{{ parameters.apiUrl }}"
+          subnetGroupName: "{{ parameters.subnetGroupName }}"
+          vpcSecurityGroup: "{{ parameters.vpcSecurityGroup }}"
           owner: "{{ parameters.owner }}"
           destination: "{{ parseRepoUrl parameters.repoUrl }}"
 
