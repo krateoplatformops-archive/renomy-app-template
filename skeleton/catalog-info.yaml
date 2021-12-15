@@ -83,7 +83,7 @@ metadata:
   description: AWS Cloud
 spec:
   owner: ${{values.owner | dump}}
-  domain: ${{values.component_id}}-domain
+  domain: cloud-apps
   system: ${{values.component_id}}-system
 ---
 apiVersion: backstage.io/v1alpha1
@@ -103,7 +103,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Domain
 metadata:
-  name: ${{values.component_id}}-domain
+  name: cloud-apps
   description: ${{values.component_id}} domain
 spec:
   owner: ${{values.owner | dump}}
